@@ -1,0 +1,208 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile with avatar, status, and device settings backing up user identity.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique user identifier matching their firebase auth UID."
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Display name of the user."
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Email address of the user."
+        },
+        "avatar": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Avatar image identifier or URL."
+        },
+        "deviceSettings": {
+          "type": "object",
+          "description": "Customizable system and transceiver settings."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of user registration."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last profile change."
+        }
+      },
+      "required": ["id", "displayName", "email", "createdAt", "updatedAt"]
+    },
+    "Chat": {
+      "title": "Backup Chat",
+      "description": "Backup header of a peer-to-peer message thread synced to the cloud.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique chat thread ID, often composed of ownerId and peerId."
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "The UID of the user who owns this chat backup."
+        },
+        "peerId": {
+          "type": "string",
+          "description": "Offline peer device or target identifier."
+        },
+        "peerName": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Name of the offline communication partner."
+        },
+        "lastMessageText": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Text of the most recently sent/received message."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last activity timestamp on the chat thread."
+        }
+      },
+      "required": ["id", "ownerId", "peerId", "peerName", "updatedAt"]
+    },
+    "Message": {
+      "title": "Message Backup",
+      "description": "A single offline peer-to-peer message backed up to the cloud chat thread.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique message ID."
+        },
+        "senderId": {
+          "type": "string",
+          "description": "The ID of the peer who sent this message."
+        },
+        "senderName": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "The name of the sender."
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 5000,
+          "description": "The textual content of the message."
+        },
+        "timestamp": {
+          "type": "integer",
+          "description": "Episodic unix timestamp."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["sending", "sent", "delivered", "read"],
+          "description": "Message delivery and read receipt status."
+        },
+        "channelType": {
+          "type": "string",
+          "enum": ["bluetooth", "wifi-direct"],
+          "description": "The wireless transceiver medium used."
+        },
+        "attachmentName": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Optional file name of attached shared file."
+        },
+        "attachmentSize": {
+          "type": "integer",
+          "description": "Optional file size of attached shared file."
+        },
+        "attachmentType": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Optional MIME type of attached shared file."
+        }
+      },
+      "required": ["id", "senderId", "senderName", "text", "timestamp", "status", "channelType"]
+    },
+    "FileTransfer": {
+      "title": "File Backup",
+      "description": "A record of an offline file transfer backed up to cloud index.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique file transfer ID."
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "The UID of the user who initiated this backup."
+        },
+        "fileName": {
+          "type": "string",
+          "maxLength": 255,
+          "description": "Name of the file."
+        },
+        "fileSize": {
+          "type": "integer",
+          "description": "Size of the file in bytes."
+        },
+        "progress": {
+          "type": "integer",
+          "description": "Transfer completion percentage."
+        },
+        "speed": {
+          "type": "integer",
+          "description": "Estimated transfer velocity."
+        },
+        "direction": {
+          "type": "string",
+          "enum": ["send", "receive"],
+          "description": "Whether the file was transmitted or retrieved locally."
+        },
+        "peerId": {
+          "type": "string",
+          "description": "Peer device identifier."
+        },
+        "peerName": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Peer display name."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "transferring", "completed", "failed"],
+          "description": "Current transfer status."
+        },
+        "timestamp": {
+          "type": "integer",
+          "description": "Record creation timestamp."
+        }
+      },
+      "required": ["id", "ownerId", "fileName", "fileSize", "direction", "peerId", "peerName", "status", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Individual user profiles stored by authenticated user UIDs."
+    },
+    "/chats/{chatId}": {
+      "schema": "Chat",
+      "description": "Individual backup threads of active chat logs."
+    },
+    "/chats/{chatId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Subcollection storing individual message items inside a backup thread."
+    },
+    "/files/{fileId}": {
+      "schema": "FileTransfer",
+      "description": "Durable register of shared files and offline document transfers."
+    }
+  }
+}

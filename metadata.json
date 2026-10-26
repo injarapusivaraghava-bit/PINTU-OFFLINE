@@ -1,0 +1,11 @@
+{
+  "name": "Remix Pintu Offline",
+  "description": "An offline-first communication simulator for local chat, Wi-Fi Direct file sharing, nearby device discovery, and peer-to-peer calls.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
